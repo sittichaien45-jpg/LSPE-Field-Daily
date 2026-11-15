@@ -201,7 +201,7 @@ body{margin:0;background:#fff}</style></head><body><div class="db" id="lspRoot">
     {u:"Unit 72-2",tot:492,    ps:[2026,12,3], pf:[2026,12,16],nw:0},
     {u:"Unit 72-3",tot:436,    ps:[2026,12,11],pf:[2026,12,19],nw:0},
     {u:"Unit 72-4",tot:3891.75,ps:[2026,10,25],pf:[2026,12,24],nw:153},
-    {u:"FLARE",    tot:1182.25,ps:[2026,10,14],pf:[2026,12,2], nw:25},
+    {u:"FLARE",    tot:4948.8, ps:[2026,10,14],pf:[2026,12,2], nw:25,manual:true},
     {u:"TANK A",   tot:7425,   ps:[2026,11,1], pf:[2027,1,15], nw:2,manual:true},
     {u:"TANK B",   tot:7425,   ps:[2026,12,1], pf:[2027,2,7],  nw:0,manual:true},
     {u:"BOG",      tot:3229.8, ps:[2026,11,28],pf:[2027,1,4],  nw:0,manual:true}
@@ -870,7 +870,7 @@ body{margin:0;background:#fff}</style></head><body><div class="db" id="lspRoot">
         g.strokeStyle='#e07b00';g.lineWidth=2.5;g.setLineDash([8,5]);g.beginPath();g.moveTo(X0+230,pb+48);g.lineTo(X0+256,pb+48);g.stroke();g.setLineDash([]);
         T(g,'Plan (cum.)',X0+262,pb+53,'400 14px '+EXP_FF,'#556');
         T(g,'At cut-off '+fdt(CUT)+': Actual '+fmt(S.A[ci],0)+' DI ('+fmt(S.A[ci]/S.tot*100,1)+'%) | Plan '+fmt(S.P[ci],0)+' DI ('+fmt(S.P[ci]/S.tot*100,1)+'%)',X0+14,pb+80,'400 15px '+EXP_FF,'#334');
-        T(g,'Total DI '+fmt(S.tot,0)+' (incl. manual TANK A, TANK B, BOG)',X0+14,pb+100,'400 13px '+EXP_FF,'#667');
+        T(g,'Total DI '+fmt(S.tot,0)+' (incl. manual TANK A, TANK B, BOG, FLARE)',X0+14,pb+100,'400 13px '+EXP_FF,'#667');
       }
     }
     // summary table
@@ -1426,8 +1426,8 @@ body{margin:0;background:#fff}</style></head><body><div class="db" id="lspRoot">
       if(note&&ci>=0&&ci<n){
         var nt='At cut-off '+fdt(CUT)+': Actual <b>'+fmt(SC.A[ci],0)+' DI ('+fmt(SC.A[ci]/SC.tot*100,1)+'%)</b> | Plan <b>'+fmt(SC.P[ci],0)+' DI ('+fmt(SC.P[ci]/SC.tot*100,1)+'%)</b>';
         if(HAS3){nt+=' | L3 plan <b>'+fmt(SC.L3[ci],0)+' DI ('+fmt(SC.L3[ci]/SC.l3tot*100,1)+'% of L3 total '+fmt(SC.l3tot,0)+')</b>';}
-        nt+=' | Total DI '+fmt(SC.tot,0)+' (incl. manual TANK A, TANK B, BOG) | Plan = sum of the daily plan of all areas, spread evenly from start to finish';
-        if(HAS3){nt+=' | L3 plan = weekly cumulative plan of 13 areas from the Level 3 table (week ending Saturday), summed and joined with straight lines; its total differs from the Total DI above (mainly FLARE)';}
+        nt+=' | Total DI '+fmt(SC.tot,0)+' (incl. manual TANK A, TANK B, BOG, FLARE) | Plan = sum of the daily plan of all areas, spread evenly from start to finish';
+        if(HAS3){nt+=' | L3 plan = weekly cumulative plan of 13 areas from the Level 3 table (week ending Saturday), summed and joined with straight lines; its total is close to the Total DI above (about 100 DI higher, from small differences in some areas)';}
         nt+=' | drawn from '+n+' days ('+fdt(SC.days[0])+' to '+fdt(SC.days[n-1])+')';
         note.innerHTML=nt;
       }
