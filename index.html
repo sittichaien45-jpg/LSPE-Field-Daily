@@ -56,9 +56,10 @@
   .sccard{margin-bottom:14px}
   .schead{display:flex;flex-wrap:wrap;align-items:center;gap:14px;margin-bottom:4px}
   .schead h2{margin:0}
-  .sclg{display:flex;gap:14px;font-size:11px;color:#556;align-items:center}
+  .sclg{display:flex;gap:14px;font-size:11px;color:#556;align-items:center;flex-wrap:wrap}
   .sclg i{display:inline-block;width:22px;height:0;border-top:3px solid #0b8a8a;margin-right:5px;vertical-align:middle}
   .sclg i.p{border-top:2px dashed #e07b00}
+  .sclg i.l3{border-top:2px dashed #7b1fa2}
   .scbox{position:relative;width:100%;overflow:hidden;min-height:200px}
   .sctip{position:absolute;display:none;pointer-events:none;background:rgba(20,40,40,.92);color:#fff;font-size:11px;line-height:1.6;padding:5px 8px;border-radius:5px;white-space:nowrap;z-index:5}
   .scn{font-size:11px;color:#667;margin-top:4px;line-height:1.6}
@@ -101,7 +102,7 @@ body{margin:0;background:#fff}</style></head><body><div class="db" id="lspRoot">
   <div class="card sccard">
     <div class="schead">
       <h2>Overall S-curve (cumulative DI, all areas)</h2>
-      <div class="sclg"><span><i></i>Actual (cum.)</span><span><i class="p"></i>Plan (cum.)</span></div>
+      <div class="sclg"><span><i></i>Actual (cum.)</span><span><i class="p"></i>Plan (cum.)</span><span><i class="l3"></i>L3 plan (cum.)</span></div>
     </div>
     <div class="scbox" id="scBox"><div class="hint">Drawing chart...</div></div>
     <div class="scn" id="scNote"></div>
@@ -276,6 +277,99 @@ body{margin:0;background:#fff}</style></head><body><div class="db" id="lspRoot">
     window.LSP_SC=SC;
   }catch(err){
     window.LSP_SC_ERR=String(err&&err.message?err.message:err);
+  }
+  // ---------- L3 plan (weekly cumulative DI per area, week ending Saturday; typed in from the Level 3 table image) ----------
+  // columns: Unit 50-1, Unit 51-1, Unit 51-2, Unit 50-2, Unit 18, Unit 72-1, Unit 72-2, Unit 72-3, Unit 72-4, TANK A, Top Tank B, BOG, FLARE
+  var L3_ROWS=[
+    ["2026-08-29",0,0,0,0,0,0,0,0,0,0,0,0,0],
+    ["2026-09-05",9,1,5,7,2,9,2,1,13,0,0,0,0],
+    ["2026-09-12",40,4,21,31,11,43,7,6,59,0,0,0,0],
+    ["2026-09-19",91,9,49,70,26,98,17,15,135,2,0,0,0],
+    ["2026-09-26",162,16,87,125,46,174,30,26,240,95,0,0,0],
+    ["2026-10-03",250,25,135,192,70,269,46,41,369,319,0,0,0],
+    ["2026-10-10",352,35,190,271,99,379,65,58,521,657,6,0,0],
+    ["2026-10-17",468,47,253,360,131,504,86,76,692,1091,119,0,0],
+    ["2026-10-24",595,59,321,458,167,640,110,97,880,1604,361,0,0],
+    ["2026-10-31",731,73,395,563,206,787,135,120,1082,2177,714,0,0],
+    ["2026-11-07",875,88,473,673,246,942,161,143,1295,2793,1160,0,0],
+    ["2026-11-14",1025,103,553,788,288,1103,189,168,1516,3434,1682,0,0],
+    ["2026-11-21",1178,118,636,906,331,1269,217,193,1743,4083,2263,0,28],
+    ["2026-11-28",1334,133,720,1026,375,1436,246,218,1973,4722,2883,0,515],
+    ["2026-12-05",1489,149,804,1145,418,1603,274,243,2203,5333,3527,0,1432],
+    ["2026-12-12",1642,164,887,1263,461,1768,303,268,2430,5899,4175,0,2557],
+    ["2026-12-19",1792,179,967,1378,504,1929,330,293,2651,6401,4811,0,3666],
+    ["2026-12-26",1936,194,1045,1489,544,2084,357,316,2864,6822,5417,0,4535],
+    ["2027-01-02",2072,207,1119,1594,582,2231,382,339,3066,7145,5975,0,4942],
+    ["2027-01-09",2199,220,1187,1692,618,2368,405,360,3254,7352,6466,0,4949],
+    ["2027-01-16",2315,232,1250,1781,651,2492,427,378,3425,7425,6875,6,4949],
+    ["2027-01-23",2417,242,1305,1860,679,2603,446,395,3577,7425,7182,113,4949],
+    ["2027-01-30",2505,251,1353,1927,704,2697,462,410,3706,7425,7371,336,4949],
+    ["2027-02-06",2576,258,1391,1981,724,2773,475,421,3811,7425,7425,647,4949],
+    ["2027-02-13",2627,263,1419,2021,738,2829,484,430,3887,7425,7425,1022,4949],
+    ["2027-02-20",2658,266,1435,2045,747,2862,490,435,3933,7425,7425,1434,4949],
+    ["2027-02-27",2667,267,1440,2052,750,2872,492,436,3946,7425,7425,1856,4949],
+    ["2027-03-06",2667,267,1440,2052,750,2872,492,436,3946,7425,7425,2264,4949],
+    ["2027-03-13",2667,267,1440,2052,750,2872,492,436,3946,7425,7425,2631,4949],
+    ["2027-03-20",2667,267,1440,2052,750,2872,492,436,3946,7425,7425,2932,4949],
+    ["2027-03-27",2667,267,1440,2052,750,2872,492,436,3946,7425,7425,3139,4949],
+    ["2027-04-03",2667,267,1440,2052,750,2872,492,436,3946,7425,7425,3228,4949],
+    ["2027-04-10",2667,267,1440,2052,750,2872,492,436,3946,7425,7425,3230,4949]
+  ];
+  // S-curve data for the on-page chart = SC + extended days + L3 line (SC itself is not changed, the exports still use SC)
+  try{
+    window.LSP_SC3=(function(){
+      var wk=L3_ROWS.map(function(r){
+        var p=r[0].split('-'),s=0,i;
+        for(i=1;i<r.length;i++){s+=r[i];}
+        return {d:new Date(+p[0],+p[1]-1,+p[2]),v:s};
+      });
+      var days=SC.days.slice(),A=SC.A.slice(),P=SC.P.slice(),endL=wk[wk.length-1].d,d;
+      for(d=addD(days[days.length-1],1);d<=endL;d=addD(d,1)){days.push(d);A.push(null);P.push(SC.tot);}
+      var L3=[],k=0,mx=0;
+      days.forEach(function(dd){
+        var v;
+        if(dd<=wk[0].d){v=wk[0].v;}
+        else if(dd>=endL){v=wk[wk.length-1].v;}
+        else{
+          while(k<wk.length-2&&dd>=wk[k+1].d){k++;}
+          var t=diff(dd,wk[k].d)/diff(wk[k+1].d,wk[k].d);
+          v=wk[k].v+(wk[k+1].v-wk[k].v)*t;
+        }
+        L3.push(v);if(v>mx)mx=v;
+      });
+      var top=Math.max(SC.tot,mx),mag=Math.pow(10,Math.floor(Math.log(top)/Math.LN10)),step=mag/2;
+      if(top/step>10)step=mag;
+      return {days:days,A:A,P:P,L3:L3,tot:SC.tot,l3tot:wk[wk.length-1].v,l3weeks:wk.length,step:step,ymax:Math.ceil(top/step)*step,ci:SC.ci,cut:SC.cut};
+    })();
+  }catch(err3){
+    window.LSP_SC3_ERR=String(err3&&err3.message?err3.message:err3);
+  }
+  // ---------- L3 plan per area (same weekly table; used by the area detail chart) ----------
+  // column index of each area in L3_ROWS (index 0 is the date)
+  var L3COLS={"Unit 50-1":1,"Unit 51-1":2,"Unit 51-2":3,"Unit 50-2":4,"Unit 18":5,"Unit 72-1":6,"Unit 72-2":7,"Unit 72-3":8,"Unit 72-4":9,"TANK A":10,"TANK B":11,"BOG":12,"FLARE":13};
+  var L3DATES=L3_ROWS.map(function(r){var p=r[0].split('-');return new Date(+p[0],+p[1]-1,+p[2]);});
+  // weekly points {d,v} of one area, or null if the area is not in the table
+  function l3Pts(u){
+    var c=L3COLS[u];
+    if(!c)return null;
+    return L3_ROWS.map(function(r,i){return {d:L3DATES[i],v:r[c]};});
+  }
+  // value on any day: straight line between two Saturdays, flat before the first and after the last point
+  function l3Val(pts,d){
+    var n=pts.length,k;
+    if(d<=pts[0].d)return pts[0].v;
+    if(d>=pts[n-1].d)return pts[n-1].v;
+    for(k=0;k<n-2&&d>=pts[k+1].d;k++){}
+    var t=diff(d,pts[k].d)/diff(pts[k+1].d,pts[k].d);
+    return pts[k].v+(pts[k+1].v-pts[k].v)*t;
+  }
+  // date range that shows the whole rising part of the line: week before the first value above 0 .. first week at the final value
+  function l3Span(pts){
+    var n=pts.length,fin=pts[n-1].v,a=-1,b=n-1,i;
+    for(i=0;i<n;i++){if(pts[i].v>0){a=i;break;}}
+    if(a<0)return null;
+    for(i=0;i<n;i++){if(pts[i].v>=fin-0.5){b=i;break;}}
+    return {s:pts[Math.max(a-1,0)].d,e:pts[b].d};
   }
   // ---------- boxes (x,y,w,h = fractions of image size for the unrotated rectangle, r = rotation in degrees about its centre) ----------
   var boxes={};
@@ -618,22 +712,29 @@ body{margin:0;background:#fff}</style></head><body><div class="db" id="lspRoot">
   }
   function drawChart(x){
     if(typeof Chart==='undefined')return;
+    // L3 plan of this area (null if not in the table); the date range is widened so that the whole L3 line is visible
+    var l3=l3Pts(x.u),sp=l3?l3Span(l3):null;
     var start=x.first<x.s?x.first:x.s,end=x.f;
-    var labels=[],cumA=[],cumP=[],daily=[],c=0,map={};
+    if(sp&&sp.s<start)start=sp.s;
+    if(sp&&sp.e>end)end=sp.e;
+    var labels=[],cumA=[],cumP=[],cumL=[],daily=[],c=0,map={};
     x.rows.forEach(function(r){map[+r.d]=r.v;});
     for(var d=new Date(start);d<=end;d=addD(d,1)){
       labels.push(d.getDate()+' '+MON[d.getMonth()]);
       var v=map[+d]||0;
       if(d<=CUT){c+=v;cumA.push(c);daily.push(v);}else{cumA.push(null);daily.push(null);}
       cumP.push(x.rate*Math.min(Math.max(diff(d,x.s)+1,0),x.nd));
+      if(l3){cumL.push(l3Val(l3,d));}
     }
+    var sets=[
+      {type:'line',label:'Actual (cum.)',data:cumA,borderColor:'#0b8a8a',backgroundColor:'#0b8a8a',borderWidth:2.5,pointRadius:0,tension:.15,yAxisID:'y'},
+      {type:'line',label:'Plan (cum.)',data:cumP,borderColor:'#e07b00',backgroundColor:'#e07b00',borderWidth:2,borderDash:[6,4],pointRadius:0,yAxisID:'y'}
+    ];
+    if(l3){sets.push({type:'line',label:'L3 plan (cum.)',data:cumL,borderColor:'#7b1fa2',backgroundColor:'#7b1fa2',borderWidth:2,borderDash:[9,3,2,3],pointRadius:0,yAxisID:'y'});}
+    sets.push({type:'bar',label:'Actual DI/day',data:daily,backgroundColor:'rgba(11,138,138,.35)',yAxisID:'y2'});
     chart=new Chart(document.getElementById('cv').getContext('2d'),{
       type:'bar',
-      data:{labels:labels,datasets:[
-        {type:'line',label:'Actual (cum.)',data:cumA,borderColor:'#0b8a8a',backgroundColor:'#0b8a8a',borderWidth:2.5,pointRadius:0,tension:.15,yAxisID:'y'},
-        {type:'line',label:'Plan (cum.)',data:cumP,borderColor:'#e07b00',backgroundColor:'#e07b00',borderWidth:2,borderDash:[6,4],pointRadius:0,yAxisID:'y'},
-        {type:'bar',label:'Actual DI/day',data:daily,backgroundColor:'rgba(11,138,138,.35)',yAxisID:'y2'}
-      ]},
+      data:{labels:labels,datasets:sets},
       options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
         plugins:{legend:{position:'bottom',labels:{boxWidth:18,font:{size:11}}}},
         scales:{x:{ticks:{maxTicksLimit:10,maxRotation:0},grid:{display:false}},
@@ -672,7 +773,26 @@ body{margin:0;background:#fff}</style></head><body><div class="db" id="lspRoot">
     }else{
       h+=row(false,'S-curve: data calculation failed ('+(window.LSP_SC_ERR||'unknown reason')+')');
     }
-    h+='Checked from the numbers embedded in this page (calculated from file (7), cut-off 13 Nov 2026); this page does not re-read the Excel file. Total DI of all areas = '+fmt(sumT,2)+'<br>';
+    var S3=window.LSP_SC3;
+    if(S3){
+      var mono=true,q;
+      for(q=1;q<S3.L3.length;q++){if(S3.L3[q]<S3.L3[q-1]-1e-9){mono=false;break;}}
+      h+=row(S3.l3weeks===33&&Math.abs(S3.l3tot-37948.7)<5,'L3 plan: <b>'+S3.l3weeks+'</b> weekly points, cumulative at the last week = <b>'+fmt(S3.l3tot,0)+'</b> DI (sum of the Field DI row in the table image: 37,948.7; the small difference is rounding in the weekly figures)');
+      h+=row(mono,'L3 plan: cumulative line never goes down');
+    }else{
+      h+=row(false,'L3 plan: data calculation failed ('+(window.LSP_SC3_ERR||'unknown reason')+')');
+    }
+    // per-area L3: final weekly value of each area vs the Field DI row of the table image (tolerance 0.6 for rounding)
+    var FIELD={"Unit 50-1":2667.0,"Unit 51-1":266.8,"Unit 51-2":1440.0,"Unit 50-2":2051.8,"Unit 18":749.5,"Unit 72-1":2871.5,"Unit 72-2":491.5,"Unit 72-3":436.0,"Unit 72-4":3946.0,"TANK A":7425.0,"TANK B":7425.0,"BOG":3229.8,"FLARE":4948.8};
+    var badL=[],nL=0;
+    Object.keys(FIELD).forEach(function(u){
+      var pts=l3Pts(u);
+      if(!pts){badL.push(u+' (not found)');return;}
+      nL++;
+      if(Math.abs(pts[pts.length-1].v-FIELD[u])>0.6){badL.push(u+' ('+fmt(pts[pts.length-1].v,1)+' vs '+fmt(FIELD[u],1)+')');}
+    });
+    h+=row(nL===13&&badL.length===0,'L3 plan per area (area charts): final weekly value of all 13 areas matches the Field DI row of the table image within 0.6 (rounding)'+(badL.length?' (differs in: '+badL.join(', ')+')':''));
+    h+='Checked from the numbers embedded in this page (calculated from file (7), cut-off 13 Nov 2026; L3 plan typed in from the table image); this page does not re-read the Excel file. Total DI of all areas = '+fmt(sumT,2)+'<br>';
     document.getElementById('checks').innerHTML=h;
   }
   // ================= Export PowerPoint (interactive, multi-slide) =================
@@ -1291,11 +1411,12 @@ body{margin:0;background:#fff}</style></head><body><div class="db" id="lspRoot">
   function draw(){
     var box=$('scBox'); if(!box)return;
     try{
-      var SC=window.LSP_SC;
+      var SC=window.LSP_SC3||window.LSP_SC;
       if(!SC){
         box.innerHTML='<div class="hint neg">No S-curve data: '+(window.LSP_SC_ERR||'the main script stopped before calculating')+'</div>';
         return;
       }
+      var HAS3=!!SC.L3;
       var CUT=SC.cut,n=SC.days.length,ci=SC.ci;
       var Wd=(box.clientWidth>=320)?box.clientWidth:1000,Ht=300,ml=58,mr=18,mt=12,mb=34,pw=Wd-ml-mr,ph=Ht-mt-mb;
       function X(i){return ml+i/(n-1)*pw;}
@@ -1303,7 +1424,12 @@ body{margin:0;background:#fff}</style></head><body><div class="db" id="lspRoot">
       // summary numbers under the chart, written before the lines are drawn
       var note=$('scNote');
       if(note&&ci>=0&&ci<n){
-        note.innerHTML='At cut-off '+fdt(CUT)+': Actual <b>'+fmt(SC.A[ci],0)+' DI ('+fmt(SC.A[ci]/SC.tot*100,1)+'%)</b> | Plan <b>'+fmt(SC.P[ci],0)+' DI ('+fmt(SC.P[ci]/SC.tot*100,1)+'%)</b> | Total DI '+fmt(SC.tot,0)+' (incl. manual TANK A, TANK B, BOG) | Plan = sum of the daily plan of all areas, spread evenly from start to finish | drawn from '+n+' days ('+fdt(SC.days[0])+' to '+fdt(SC.days[n-1])+')';
+        var nt='At cut-off '+fdt(CUT)+': Actual <b>'+fmt(SC.A[ci],0)+' DI ('+fmt(SC.A[ci]/SC.tot*100,1)+'%)</b> | Plan <b>'+fmt(SC.P[ci],0)+' DI ('+fmt(SC.P[ci]/SC.tot*100,1)+'%)</b>';
+        if(HAS3){nt+=' | L3 plan <b>'+fmt(SC.L3[ci],0)+' DI ('+fmt(SC.L3[ci]/SC.l3tot*100,1)+'% of L3 total '+fmt(SC.l3tot,0)+')</b>';}
+        nt+=' | Total DI '+fmt(SC.tot,0)+' (incl. manual TANK A, TANK B, BOG) | Plan = sum of the daily plan of all areas, spread evenly from start to finish';
+        if(HAS3){nt+=' | L3 plan = weekly cumulative plan of 13 areas from the Level 3 table (week ending Saturday), summed and joined with straight lines; its total differs from the Total DI above (mainly FLARE)';}
+        nt+=' | drawn from '+n+' days ('+fdt(SC.days[0])+' to '+fdt(SC.days[n-1])+')';
+        note.innerHTML=nt;
       }
       var h='<svg id="scSvg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 '+Wd+' '+Ht+'" preserveAspectRatio="xMinYMid meet" style="display:block;width:100%;height:'+Ht+'px;font-family:system-ui,sans-serif">';
       var v,k,j;
@@ -1319,10 +1445,12 @@ body{margin:0;background:#fff}</style></head><body><div class="db" id="lspRoot">
         }
       });
       h+='<line x1="'+ml+'" x2="'+(Wd-mr)+'" y1="'+(mt+ph)+'" y2="'+(mt+ph)+'" stroke="#9bb" stroke-width="1"/>';
-      var pp='',aa='';
+      var pp='',aa='',ll='';
       for(j=0;j<n;j++){pp+=(j?'L':'M')+X(j).toFixed(1)+' '+Y(SC.P[j]).toFixed(1)+' ';}
+      if(HAS3){for(j=0;j<n;j++){ll+=(j?'L':'M')+X(j).toFixed(1)+' '+Y(SC.L3[j]).toFixed(1)+' ';}}
       for(j=0;j<=ci&&j<n;j++){aa+=(j?'L':'M')+X(j).toFixed(1)+' '+Y(SC.A[j]).toFixed(1)+' ';}
       h+='<path d="'+pp+'" fill="none" stroke="#e07b00" stroke-width="2" stroke-dasharray="6 4"/>';
+      if(HAS3){h+='<path d="'+ll+'" fill="none" stroke="#7b1fa2" stroke-width="2" stroke-dasharray="9 3 2 3"/>';}
       h+='<path d="'+aa+'" fill="none" stroke="#0b8a8a" stroke-width="2.8" stroke-linejoin="round"/>';
       if(ci>=0&&ci<n){
         h+='<line x1="'+X(ci)+'" x2="'+X(ci)+'" y1="'+mt+'" y2="'+(mt+ph)+'" stroke="#0b5c5c" stroke-width="1" stroke-dasharray="3 3"/>';
@@ -1342,6 +1470,7 @@ body{margin:0;background:#fff}</style></head><body><div class="db" id="lspRoot">
         var t='<b>'+fdt(SC.days[i])+'</b>';
         if(SC.A[i]!==null){t+='<br>Actual: '+fmt(SC.A[i],0)+' DI ('+fmt(SC.A[i]/SC.tot*100,1)+'%)';}
         t+='<br>Plan: '+fmt(SC.P[i],0)+' DI ('+fmt(SC.P[i]/SC.tot*100,1)+'%)';
+        if(HAS3){t+='<br>L3 plan: '+fmt(SC.L3[i],0)+' DI ('+fmt(SC.L3[i]/SC.l3tot*100,1)+'% of L3 total)';}
         tip.innerHTML=t;tip.style.display='block';
         var tx=X(i)*sx+12;
         if(tx+tip.offsetWidth>r.width)tx=X(i)*sx-tip.offsetWidth-12;
